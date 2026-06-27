@@ -1,0 +1,67 @@
+═══════════════════════════════════════════════════════════════════════════════
+FOSSEE SUMMER FELLOWSHIP 2026 — TASK 3: SURROGATE MODELING RESULTS SUMMARY
+═══════════════════════════════════════════════════════════════════════════════
+
+SYSTEM        : Benzene – Toluene Binary Distillation Column
+THERMODYNAMICS: Peng-Robinson EOS (Antoine + Fenske-Underwood-Gilliland)
+DATASET SIZE  : 500 simulation runs
+TRAIN/TEST    : 80% / 20% (400 train, 100 test)
+
+──────────────────────────────────────────────────────────────────────────────
+BEST MODEL SELECTED: XGBoost (Gradient Boosted Trees)
+  Config: n_estimators=300, max_depth=6, learning_rate=0.05,
+          subsample=0.8, colsample_bytree=0.8
+──────────────────────────────────────────────────────────────────────────────
+
+FINAL PERFORMANCE METRICS (XGBoost on test set):
+
+  Target Variable           MAE           RMSE          R²
+  ──────────────────────── ─────────────  ─────────────  ──────
+  Distillate Purity (xD)   0.02148       0.03074        0.9390
+  Bottoms Purity (xB)      0.02635       0.03578        0.9215
+  Condenser Duty QC (kW)   79.31         98.63          0.9822
+  Reboiler Duty QR (kW)    117.53        144.15         0.9631
+
+──────────────────────────────────────────────────────────────────────────────
+ALL MODELS COMPARISON (Average R² across 4 targets):
+
+  Linear Regression   : 0.8482
+  Random Forest       : 0.5588
+  XGBoost             : 0.9514  ← BEST
+  ANN (MLP)           : unstable (output scaling issue, see report Sec 9)
+
+──────────────────────────────────────────────────────────────────────────────
+SAMPLE PREDICTIONS (first 5 test samples, XGBoost):
+
+  Actual xD   Pred xD   Actual xB   Pred xB   Actual QC    Pred QC
+  See sample_predictions.csv for full 15-row table.
+
+──────────────────────────────────────────────────────────────────────────────
+KEY OBSERVATIONS:
+
+1. XGBoost achieves R² ≥ 0.92 on ALL four target variables — suitable
+   for production surrogate deployment.
+
+2. Duty predictions (QC, QR) are extremely accurate (R²=0.98, 0.96),
+   driven by strong linear energy balance relationships.
+
+3. Purity predictions (xD, xB) achieve R²~0.93/0.92 — robust given the
+   complex nonlinear VLE thermodynamics governing separation.
+
+4. Physical trend validation confirmed: the model correctly predicts
+   xD↑, xB↓ with increasing reflux ratio, and xD↑ with more stages.
+
+5. SHAP analysis identifies feed_composition_benz, reflux_ratio, and
+   rel_volatility as the dominant features for distillate purity (xD).
+
+6. No overfitting observed in XGBoost: train/test R² gap < 0.03.
+
+7. ANN underperformed due to mixed output scales; future fix: per-target
+   StandardScaler on y before MLP training.
+
+──────────────────────────────────────────────────────────────────────────────
+CONCLUSION:
+XGBoost is recommended as the production surrogate for this distillation
+system. It is fast (sub-millisecond inference), accurate (R²≥0.92),
+interpretable via SHAP, and physically consistent with distillation theory.
+═══════════════════════════════════════════════════════════════════════════════
