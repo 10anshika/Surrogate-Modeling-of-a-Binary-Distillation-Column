@@ -1,7 +1,6 @@
-# FOSSEE Summer Fellowship 2026 — Task 3
 ## Surrogate Modeling of Binary Distillation Column (Benzene–Toluene)
 
-**Submitted by:** Anshika | BSc Data Science (Final Year) | April 2026
+**Submitted by:** Anshika | April 2026
 
 ---
 
